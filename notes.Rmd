@@ -144,7 +144,7 @@ The `length` function returns the number of values in a vector.
 exercise("Use the `seq` function to generate a vector of 30 evenly spaced numbers from 0 to 1. Confirm its length using the `length` function.")
 ```
 
----
+\pagebreak
 
 # R Course Cheat Sheet
 
