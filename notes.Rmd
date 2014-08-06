@@ -1,0 +1,172 @@
+---
+title: "Introductory R Course"
+author: "Joe Thorley"
+date: "August 6, 2014"
+output:
+  pdf_document:
+    number_sections: yes
+    toc: yes
+---
+
+```{r,echo = FALSE}
+
+library(knitr)
+
+exercise_number <- 0
+exercise <- function (txt) {
+  exercise_number <<- exercise_number + 1
+  cat(paste0("\n**Exercise** ", exercise_number), paste0("*", txt, "*\n"))
+}
+
+ktable <- function (...) {
+  x <- c(...)
+  mat <- matrix(NA, nrow = length(x), ncol = 2)
+  mat[, 1] <- names(x)
+  mat[, 2] <- x
+  colnames(mat) <- mat[1,]
+  mat <- mat[-1, , drop = FALSE]
+  mat <- mat[order(mat[, 1, drop = TRUE]), , drop = FALSE]
+  cat("\n")
+  cat(kable(mat, row.names = FALSE, output = FALSE), sep = "\n")
+  cat("\n")
+}
+
+```
+
+# Introduction
+
+The purpose of these course notes is to introduce participants to basic programming, graphics and statistics in R.
+
+## Getting Started
+
+
+# R Basics
+
+## Calculations
+R can be used just like a calculator. An expression is entered at the `>` prompt and the result printed.
+```{r}
+3 + 4
+3 * 4
+```
+
+To faciliate cut and paste the R code in this document is not preceded by the `>` prompt and any output is preceded by two comment characters `##` (comments are introduced below).
+
+The `[1]` at the start of each result indicates that the result is the first element in a *vector* (vectors are introduced below).
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("What is nine raised to the power of three?")
+exercise("And nine raised to the power of 0.5?")
+exercise("97 out of 284 eggs survive. What is the mortality expressed as a percentage?")
+exercise("What is the result of `3 * 4 + 5`? And `5 + 3 * 4`? What does this indicate?")
+```
+
+## Precedence
+In R, if one operator has *precedence* over another then it is evaluated first. The order in which operators are evaluated can be controlled using brackets.
+```{r}
+3 * 4 + 5
+3 * (4 + 5)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Does the `*` operator have precedence over the `^` operator? 
+Demonstrate with an example.")
+```
+
+## Functions
+Most of R's functionality comes from its *functions*. A function takes zero, one or multiple *arguments*, depending on the function and returns a value. To call a function enter it's name followed by brackets - include any arguments in the brackets.
+```{r}
+log(10)
+```
+
+To find out more about a function `fun` type `?fun`. To search for the functions associated with a topic type `??topic` or `??"multiple topics"`.
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Which function calculates cumulative sums? And what arguments does it take?")
+```
+
+## Arguments
+The R Documentation for `log` indicates that the function requires an argument `x` that is a vector of
+*numeric* (real) or *complex* numbers and an argument `base` which is the base of the logarithm. 
+If undefined the value of `base` is set to be `exp(1)`, i.e., `log` calculates natural logarithms by default.
+
+When calling a function its arguments can be specified using *positional* and/or 
+*named* matching.
+
+```{r}
+log(x = 10, base = 2)
+log(base = 2, x = 10)
+log(10, 2)
+log(2, 10)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("What arguments does the function `sqrt` take?")
+```
+
+## Assignment
+The result of an expression can be *assigned* to an object using the `<-` operator. The object can then be used in subsequent expressions.
+```{r}
+x <- 3 + 4
+x
+x / 2
+y <- x * x
+y
+```
+
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Set `x` to be `7`. What is the value of `x^x`. Save the value in a object called `i`. If you assign the value `20` to the object `x` does the value of `i` change? What does this indicate about how R assigns values to objects?")
+```
+
+## Workspace
+When a value is assigned to an object, the object can be used in subsequent calculations because it is stored in the *workspace*. The workspace is an area of memory associated with the current session.
+
+The `objects()` function lists the objects in the workspace. Calling `remove(x)` deletes object `x` from the workspace. Typing `remove(list = objects())` removes all objects.
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Using the `remove` function and the assignment operator arrange your workspace so that 
+it contains three objects `x`, `y` and `z` with values of `3`, `5` and `7`, respectively.")
+```
+
+## Vectors
+A *vector* is a string of values.
+
+### Generation
+Vectors can be created using the `c` (concatenate) and `seq` (sequence) functions.
+```{r}
+c(1, 3, 5, 7, 13)
+seq(from = 1, to = 11, by = 2)
+seq(1, 6)
+```
+The `length` function returns the number of values in a vector.
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Use the `seq` function to generate a vector of 30 evenly spaced numbers from 0 to 1. Confirm its length using the `length` function.")
+```
+
+---
+
+# R Course Cheat Sheet
+
+```{r, echo = FALSE, results = 'asis'}
+
+ktable("Operator" = "Description",
+        "`*`" = "Multiplication. *Usage*: `5 * 3`",
+        "`/`" = "Division. *Usage*: `x / y`",
+        "`+`" = "Addition. *Usage*: `4 + 3`",
+        "`-`" = "Subtraction. *Usage*: `x - 5`",
+        "`^`" = "Power. *Usage*: `6^3`",
+        "`<-`" = "Assignment. *Shortcut*: **alt-**. *Usage*: `x <- 5`",
+        "`(`" = "Bracket. *Usage*: `2*(3+5)`",
+        "`?`" = "Help file. *Usage*: `?function`",
+        "`??`" = "Search help files. *Usage*: `??topic`"
+  )
+
+ktable("Math Function" = "Description",
+        "`log`" = "Logarithm. *Usage*: `log(x)`",
+        "`exp`" = "Exponential. *Usage*: `exp(x)`",
+        "`cumsum`" = "Cumulative sum. *Usage*: `cumsum(x)`",
+        "`sqrt`" = "Square-root. *Usage*: `sqrt(9)`"
+  )
+
+```
