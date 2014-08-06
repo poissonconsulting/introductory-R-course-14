@@ -169,4 +169,10 @@ ktable("Math Function" = "Description",
         "`sqrt`" = "Square-root. *Usage*: `sqrt(9)`"
   )
 
+ktable("Vector Function" = "Description",
+        "`c`" = "Concatenate. *Usage*: `c(1, 3)`",
+        "`seq`" = "Sequence. *Usage*: `seq(1, 4)`",
+        "`length`" = "Length. *Usage*: `length(c(1, 2, 3, 4))`"
+  )
+
 ```
