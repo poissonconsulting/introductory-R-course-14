@@ -6,6 +6,7 @@ output:
   pdf_document:
     number_sections: yes
     toc: yes
+bibliography: references.bib
 ---
 
 ```{r,echo = FALSE}
@@ -35,7 +36,8 @@ ktable <- function (...) {
 
 # Introduction
 
-The purpose of these course notes is to introduce participants to basic programming, graphics and statistics in R.
+The purpose of these course notes is to introduce participants to basic programming, graphics and statistics in R [@r_core_team_r:_2013] [@bradford_using_2005 pp. 23-34, and some]
+[-@royle_hierarchical_2008]. see @royle_hierarchical_2008 [pp. 33-45]
 
 ## Getting Started
 
@@ -141,10 +143,82 @@ seq(1, 6)
 The `length` function returns the number of values in a vector.
 
 ```{r, echo = FALSE, results = 'asis'}
-exercise("Use the `seq` function to generate a vector of 30 evenly spaced numbers from 0 to 1. Confirm its length using the `length` function.")
+exercise("Use the `seq` function to generate a vector of `30` evenly spaced numbers from `0` to `1`. Confirm its length.")
 ```
 
-\pagebreak
+## Vectorized calculations
+In R, there are no scalars. Instead single values are considered vectors of length `1`. Even simple calculations are designed to be performed on vectors.
+```{r}
+x <- seq(3, 5)
+y <- c(1, 2, 2)
+x - y
+x / y
+```
+If the vectors in an expression are of different lengths the shorter vector is *recycled*.
+
+```{r}
+x <- seq(1, 4)
+y <- seq(1, 2)
+x / y
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Create the vector that is the square root of all the whole numbers from `1` to `100`.")
+exercise("Create a vector that gives the deviation of the values in the vector `seq(1, 10)` from their mean.")
+```
+
+## Classes
+The vectors you have dealt with so far have been of class `numeric` which have real numbers as their permissible values.
+```{r}
+x <- c(1.5, 2.7)
+class(x)
+```
+
+Another important vector class is `character` which has text values.
+```{r}
+x <- c("txt", "one", "1", "1.9")
+class(x)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Try combining character and numeric values together in the same vector. What happens?")
+```
+
+
+## Missing values
+Missing values are represented by `NA`. Functions such as `min`, `max` and `mean`
+that require knowledge of
+all the input values return an `NA` if one or more values are missing.
+This behaviour can be altered by setting the `na.rm` argument to be `TRUE`.
+```{r}
+x <- c(1, 2, 3, NA)
+mean(x)
+mean(x, na.rm = TRUE)
+```
+
+## Factors
+Factors represent categorical variables.
+
+Vectors can be coerced to class `factor` using the `as.factor` function.
+```{r}
+x <- c("blue", "green", "blue", "red", "green")
+x <- as.factor(x)
+class(x)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Coerce the factor `x` to a vector of class numeric. What happens?")
+```
+
+## Data Frames
+*Data frames* are the fundamental data structure in R. A data frame is a two-dimensional data set where the columns are variables (vectors) of equal length.
+
+### data
+R packages often include data sets.  To see the data sets in the current *search path}* (introducted later) type `data()`. To print a summary of the `trees` data frame type `summary(trees)`. Type `trees` to print the data frame itself. To get more information on `trees` type `?trees`.
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("What are the data in the `ToothGrowth` data set?")
+```
 
 # R Course Cheat Sheet
 
@@ -173,6 +247,11 @@ ktable("Vector Function" = "Description",
         "`c`" = "Concatenate. *Usage*: `c(1, 3)`",
         "`seq`" = "Sequence. *Usage*: `seq(1, 4)`",
         "`length`" = "Length. *Usage*: `length(c(1, 2, 3, 4))`"
+  )
+
+ktable("Other Function" = "Description",
+        "`objects`" = "Objects in workspace. *Usage*: `objects(); objects(2)`. Alias: `ls`",
+        "`remove`" = "Remove object(s) from workspace. *Usage*: `remove(list = ls())`"
   )
 
 ```
