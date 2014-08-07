@@ -6,6 +6,8 @@ output:
   pdf_document:
     number_sections: yes
     toc: yes
+  html_document:
+    toc: yes
 bibliography: references.bib
 ---
 
@@ -39,8 +41,13 @@ ktable <- function (...) {
 The purpose of these course notes is to introduce participants to basic programming, graphics and statistics in R [@r_core_team_r:_2013] [@bradford_using_2005 pp. 23-34, and some]
 [-@royle_hierarchical_2008]. see @royle_hierarchical_2008 [pp. 33-45]
 
-## Getting Started
+## R, S and S-Plus
 
+R and S-PLUS are both implementations for the S language which is a language for 'programming with data'. R is free and open source. 
+
+## Installation
+
+Download the the most recent version of the base distribution binary for your platform from http://cran.r-project.org/ and install using the default options. Then start up R.
 
 # R Basics
 
@@ -106,7 +113,7 @@ exercise("What arguments does the function `sqrt` take?")
 ```
 
 ## Assignment
-The result of an expression can be *assigned* to an object using the `<-` operator. The object can then be used in subsequent expressions.
+The result of an expression can be *assigned* to an object using the `<-` operator. The object can then be used in subsequent expressions. To save finger strokes type alt-.
 ```{r}
 x <- 3 + 4
 x
@@ -218,6 +225,98 @@ R packages often include data sets.  To see the data sets in the current *search
 
 ```{r, echo = FALSE, results = 'asis'}
 exercise("What are the data in the `ToothGrowth` data set?")
+```
+
+### Referencing columns
+When referencing a column (vector) in a data frame both the data frame and column name must be specified.  
+The `$` operator is used to separate the data frame and column name. 
+```{r}
+trees$Girth
+```
+
+The `$` operator can also be used to reference a new column in a data frame. In the following example the girth (circumference) is being used to estimate the cross-sectional area. 
+```{r}
+trees$Area <- trees$Girth^2 / (4 * pi)
+summary(trees)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Add a column `Diameter` to `trees` bearing in mind that `pi` is the ratio of the circumference (girth) to the diameter.")
+```
+
+# RStudio
+
+Thus far you have been using R through its Graphical User Interface (GUI).
+However a number of third-party programs provide more powerful Integrated Development Environments (IDEs) for interfacing with R. My favourite is RStudio the desktop version of which can be downloaded from http://rstudio.org/download/desktop. Like R, RStudio is free and open source. The remainder of this course is taught assuming you are using RStudio.
+
+## Console
+By default the pane in the bottom left of RStudio is the R console. You can enter expressions in the console in the same way you have been entering expressions in the R console in the R GUI.
+
+## Workspace
+The first window in the top right pane provides an interface for viewing and manipulating the objects in the workspace.
+
+## History
+The second window in the top right panel allows you to view and copy the expressions you have executed at the console.
+
+## Packages
+Everything in the S language is an object - even the functions and operators. With the exception of the workspace, all of the available objects are contained within packages.  
+
+To see all the packages that are currently *loaded* on the *search path* type `search()`.
+```{r}
+search()
+```
+Note `.GlobalEnv` is the workspace. For a detailed description of how R searches and finds objects see http://obeautifulcode.com/R/How-R-Searches-And-Finds-Stuff/.
+
+To see all the packages that are currently installed on your computer go to the Packages window in the bottom right pane of RStudio. Packages that are currently loaded are selected. You can load a package by selecting it or by typing `library(package_name)` at the console.
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Load the package `foreign`. What arguments does the function `read.dbf` in the
+`foreign` package take?")
+```
+
+To view the packages on the Comprehensive R Archive Network (CRAN) website that are currently available to install on your computer go to
+http://cran.r-project.org/web/packages/available_packages_by_name.html.
+
+You can install a package from the CRAN site onto your computer by clicking Install on the Packages window and typing its name.
+```{r, echo = FALSE, results = 'asis'}
+exercise("Install the package `ggplot2` onto your computer and then load it. What arguments does the function `ggplot` take.")
+```
+
+## Working Directory
+Each R session is associated with a folder on your computer that is referred to as the working directory. To view the contents of the working directory go to the Files window in the bottom right pane. To change the working directory use the **Choose Directory...** suboption of the **Set Working Directory** option from the **Session** menu in the global toolbar. Alternatively use the functions `getwd()` and `setwd()`.
+```{r, echo = FALSE, results = 'asis'}
+exercise("Create a new folder on your desktop called RCourse and make this folder the working directory. To ensure you have been successful confirm that the output of `getwd()` refers to your RCourse folder.")
+```
+
+
+## Projects
+Instead of setting the working directory each time you restart RStudio you can associate
+the contents of a folder with a *project* - then all you have to do is to select the project.
+
+To create a new project use the **New Project** command (available on the **File** menu of the global toolbar).
+```{r, echo = FALSE, results = 'asis'}
+exercise("Create a new project called RCourse in the RCourse folder on your desktop. As the folder already exists choose the **Create project from: Existing Directory** option.
+  To confirm you were successful quit RStudio and double-click the RCourse.Rproj file
+  in the RCourse folder - RStudio should restart with RCourse as the working directory.")
+```
+
+# Transferring Data
+
+## Comma Separated Files
+
+The simplest way to input and output data is in the form of comma separated files. Comma separated files, which have the suffix **.csv**, are recognised by almost all
+statistical and spreadsheet programs including \verb_R_.
+
+The following line of code saves the ToothGrowth data frame to the working directory as 
+a csv file called `ToothGrowthMissing`.
+```
+write.csv(ToothGrowth, "ToothGrowthMissing.csv", row.names = FALSE)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Run the line of code above and then open the ToothGrowthMissing csv file in a spreadsheet program and replace the first five values in the `len` column with `NA`.")
+exercise("Now use the `read.csv` function to import the ToothGrowthMissing csv file into the workspace. Use the `na.omit` function to delete the 
+missing values. What happens to the data frame when the missing values are deleted?")
 ```
 
 # R Course Cheat Sheet
