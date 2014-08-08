@@ -130,10 +130,10 @@ exercise("Set `x` to be `7`. What is the value of `x^x`. Save the value in a obj
 ## Workspace
 When a value is assigned to an object, the object can be used in subsequent calculations because it is stored in the *workspace*. The workspace is an area of memory associated with the current session.
 
-The `objects()` function lists the objects in the workspace. Calling `remove(x)` deletes object `x` from the workspace. Typing `remove(list = objects())` removes all objects.
+The `ls()` function lists the objects in the workspace. Calling `rm(x)` deletes object `x` from the workspace. Typing `rm(list = ls())` removes all objects.
 
 ```{r, echo = FALSE, results = 'asis'}
-exercise("Using the `remove` function and the assignment operator arrange your workspace so that 
+exercise("Using the `rm` function and the assignment operator arrange your workspace so that 
 it contains three objects `x`, `y` and `z` with values of `3`, `5` and `7`, respectively.")
 ```
 
@@ -262,10 +262,15 @@ The second window in the top right panel allows you to view and copy the express
 Everything in the S language is an object - even the functions and operators. With the exception of the workspace, all of the available objects are contained within packages.  
 
 To see all the packages that are currently *loaded* on the *search path* type `search()`.
+
 ```{r}
 search()
 ```
-Note `.GlobalEnv` is the workspace. For a detailed description of how R searches and finds objects see http://obeautifulcode.com/R/How-R-Searches-And-Finds-Stuff/.
+`.GlobalEnv` is the workspace. To see all the objects in a package type `ls("package:package_name")`. For example
+```{r, eval = FALSE}
+ls("package:stats")
+```
+For a detailed description of how R searches and finds objects see http://obeautifulcode.com/R/How-R-Searches-And-Finds-Stuff/.
 
 To see all the packages that are currently installed on your computer go to the Packages window in the bottom right pane of RStudio. Packages that are currently loaded are selected. You can load a package by selecting it or by typing `library(package_name)` at the console.
 
@@ -277,7 +282,7 @@ exercise("Load the package `foreign`. What arguments does the function `read.dbf
 To view the packages on the Comprehensive R Archive Network (CRAN) website that are currently available to install on your computer go to
 http://cran.r-project.org/web/packages/available_packages_by_name.html.
 
-You can install a package from the CRAN site onto your computer by clicking Install on the Packages window and typing its name.
+You can install a package from the CRAN site onto your computer by clicking Install on the Packages window and typing its name alternatively type `install.packages("package_name")`.
 ```{r, echo = FALSE, results = 'asis'}
 exercise("Install the package `ggplot2` onto your computer and then load it. What arguments does the function `ggplot` take.")
 ```
@@ -307,10 +312,10 @@ exercise("Create a new project called RCourse in the RCourse folder on your desk
 The simplest way to input and output data is in the form of comma separated files. Comma separated files, which have the suffix **.csv**, are recognised by almost all
 statistical and spreadsheet programs including \verb_R_.
 
-The following line of code saves the ToothGrowth data frame to the working directory as 
+The following line of code saves the ToothGrowth data frame in the datasets package to the working directory as 
 a csv file called `ToothGrowthMissing`.
-```
-write.csv(ToothGrowth, "ToothGrowthMissing.csv", row.names = FALSE)
+```{r, eval = FALSE}
+write.csv(datasets::ToothGrowth, "ToothGrowthMissing.csv", row.names = FALSE)
 ```
 
 ```{r, echo = FALSE, results = 'asis'}
@@ -318,6 +323,108 @@ exercise("Run the line of code above and then open the ToothGrowthMissing csv fi
 exercise("Now use the `read.csv` function to import the ToothGrowthMissing csv file into the workspace. Use the `na.omit` function to delete the 
 missing values. What happens to the data frame when the missing values are deleted?")
 ```
+
+# Manipulating Data with dplyr
+
+The **dplyr** package provides functions for manipulating data frames. Four key 
+functions are:
+
+- filter: chose a subset of rows based on conditions
+- select:  chose a subset of columns based on names
+- arrange: sort rows
+- mutate: add new columns
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("What does the following R code do to the ToothGrowth data frame")
+```
+
+```{r, eval = FALSE}
+install.packages("dplyr")
+library(dplyr)
+
+ToothGrowth <- filter(datasets::ToothGrowth, len < 30)
+ToothGrowth <- mutate(ToothGrowth, len2 = len * 2)
+ToothGrowth <- select(ToothGrowth, len2, supp, dose)
+ToothGrowth <- arrange(ToothGrowth, dose, supp, len2)
+```
+
+If they were nested the operations would look like the following which is almost unreadable.
+```{r, eval = FALSE}
+ToothGrowth <- arrange(select(mutate(filter(datasets::ToothGrowth, len < 30), len2 = len * 2), 
+  len2, supp, dose), dose, supp, len2)
+```
+
+To improve readibility, the same operations can be joined in left to right order using the forward-pipe operator `%>%` in the `magrittr` package
+to 
+```{r, eval = FALSE}
+install.packages("magrittr")
+library(magrittr)
+
+ToothGrowth <- datasets::ToothGrowth %>% filter(len < 30) %>% mutate(len2 = len * 2) %>% 
+  select(len2, supp, dose) %>% arrange(dose, supp, len2)
+```
+
+# Programming
+
+## Scripts
+Rather than entering expressions into R one by one at the command line, 
+a more efficient method is to type the expressions into a text file 
+called a *script* and then send all of them to R at the same time. 
+R scripts are indicated by the suffix `.r` or `.R`.
+
+Open a new script using the R Script suboption of the New option in the File menu. Next paste the following expressions into the script.
+```{r, eval=FALSE}
+# this is a comment!
+graphics.off()
+rm(ls=objects())
+
+summary(trees)
+```
+
+Now save the script in your working directory as `trees.r`. Finally type Command-A to select the entire script then Command-Enter to send it to the console.
+
+Congratulations you've written and executed your first script. The first line is a comment - R ignores it. The second line closes any open graphics windows while the second line removes all objects from the workspace so that the script is starting with a blank slate.
+
+## Coding
+For some reason some people still work in farenheit. The following equation
+converts a temperature in farenheit ($F$) to celsius ($C$).
+
+$$ C = (F - 32) * 5 / 9$$
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Append code to the `trees.r` script to convert 45 farenheit to celcius.
+  Note The correct answer is 7.22.")
+
+exercise("Now use the code to convert the following temperatures in farenheit to celcius:
+  0 , 32, 64, 100.")
+```
+For further information on R coding style see http://stat405.had.co.nz/r-style.html.
+
+## Functions
+R's power stems from its extensibility - users can easily write their own functions.
+The following code defines a function `farenheit_to_kelvin` which converts a temperature in farenheit to kelvins. The inspiration for this example came from [Software Carpentry's](http://software-carpentry.org/) [novice R bootcamp material](https://github.com/swcarpentry/bc/tree/master/novice/r).
+```{r}
+farenheit_to_kelvin <- function (farenheit) {
+  kelvin <- ((farenheit - 32) * 5 / 9) + 273.15
+  return (kelvin)
+}
+```
+
+The first line tells R that `farenheit_to_kelvin` is a function that takes a single argument named `farenheit`. The squiggly brackets tell R where the function 
+definition starts and ends. The first line of code in the function definition
+converts `farenheit` to `kelvin` while the second and last line tells the 
+function to return the value of `kelvin`.
+
+Paste the code into a script and then run it. R does nothing because executing the code
+simply defines the function. Look in your workspace (`ls()`) and you will see
+`farenheit_to_kelvin` present. If you type `farenheit_to_kelvin` R will print 
+the object for you which in this case is the function definition. 
+To call the function you have to follow 
+its name with brackets that include any arguments you wish to pass to the function, i.e., `farenheit_to_kelvin(c(0, 32))`.
+
+\begin{Exercise}
+Define a function in the \verb_trees.r_ script that calculates the standard deviation of its one argument \verb_y_.
+Use the function to calculate the standard deviation of each of the columns in \verb_trees_.
 
 # R Course Cheat Sheet
 
