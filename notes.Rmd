@@ -582,6 +582,45 @@ exercise("Modify your `trees.R` script so that it fits a linear model to `Volume
 confidence and prediction intervals.")
 ``` 
 
+## Residual plots
+A linear regression model is only valid if its residuals are consistent with the assumed error structure.
+A diagnostic plot can be produced using the following code.
+
+```{r message = FALSE}
+ggplot(mod, aes(.fitted, .resid)) + 
+geom_hline(yintercept = 0) + 
+geom_point() +
+geom_smooth(se = FALSE)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("What does the previous diagnostic plot suggest to you?")
+exercise("Try fitting an allometric relationship by `log` transforming
+`Volume` and `Girth` and then using the same basic linear regression model.
+Does the diagnostic plot suggest an improvement in
+the model?")
+``` 
+
+## ANCOVA
+The basic ANCOVA (analysis of covariance) model includes one categorical and one continous
+predictor variable without interactions. It can be expressed algebraically as follows
+$$ y_{ij} = \alpha_{i} + \beta x_{j} + \epsilon_{ij}$$
+where $\alpha_{i}$ is the intercept for the $i_{th}$ group mean and
+$\beta$ is the slope and the error terms ($\epsilon_{ij}$) are independent
+and normally distributed with equal variance.
+
+The following code fits the basic ANCOVA model to the `ToothGrowth` data  and prints a summary table.
+```{r}
+mod <- lm(len ~ supp + dose, data = ToothGrowth)
+summary(mod)
+```
+
+The model's coefficients indicate that the slope of the line is 9.76 and that `VC` is 3.7 less than `OJ`.
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Are the model's residuals consistent with the assumed error structure?")
+```
+
 # R Course Cheat Sheet
 
 ```{r, echo = FALSE, results = 'asis'}
