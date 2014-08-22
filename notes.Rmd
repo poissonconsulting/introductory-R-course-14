@@ -324,7 +324,7 @@ exercise("Now use the `read.csv` function to import the ToothGrowthMissing csv f
 missing values. What happens to the data frame when the missing values are deleted?")
 ```
 
-# Manipulating Data with dplyr
+# Manipulating Data
 
 The **dplyr** package provides functions for manipulating data frames. Four key 
 functions are:
@@ -420,11 +420,167 @@ simply defines the function. Look in your workspace (`ls()`) and you will see
 `farenheit_to_kelvin` present. If you type `farenheit_to_kelvin` R will print 
 the object for you which in this case is the function definition. 
 To call the function you have to follow 
-its name with brackets that include any arguments you wish to pass to the function, i.e., `farenheit_to_kelvin(c(0, 32))`.
+its name with paired brackets that include any arguments you wish to pass to the function, i.e., `farenheit_to_kelvin(c(0, 32))`.
 
-\begin{Exercise}
-Define a function in the \verb_trees.r_ script that calculates the standard deviation of its one argument \verb_y_.
-Use the function to calculate the standard deviation of each of the columns in \verb_trees_.
+# Graphics
+The `ggplot2` library provides a family of functions for producing high-quality graphics within
+a unified conceptual framework. 
+
+## Geoms
+The following code produces a scatterplot of `Volume` on the
+y-axis against `Girth` on the x-axis for the `trees` data frame.
+The first line of code loads the `ggplot2` library while
+the second line specifies the data and relationships of interest. The third line indicates the method (geom) for representing the relationships among the data while the last line plots the ggplot object (in this case `gp`).
+
+```{r}
+library(ggplot2)
+gp <- ggplot(data = trees, aes(x = Girth, y = Volume))
+gp <- gp + geom_point()
+print(gp)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("What happens if you replace `geom_point` with `geom_line`?")
+exercise("And what happens if you add both geoms to the `gp` object?")
+```  
+
+The available geoms are documented at <http://docs.ggplot2.org/current/>.
+
+## Windows
+By default plots are printed to the Plots window in the bottom right pane of RStudio. To create a new graphics window use the
+`windows()` function, where by default the width and height are both 7 inches. If working on a Mac using the `quartz()` function instead.
+
+The most recent ggplot object to have been created or modified or plotted can be saved in the working
+directory using the `ggsave` function.
+For example to save it as a 4 by 4 inch 600 dots per inch (dpi) Portable Network Graphics (png) file
+called trees type `ggsave("trees.png",width=4,height=4,dpi=600)`. 600 dpi png files are recommended for inclusion in word documents.
+
+If the number of open windows becomes unwieldy the command `graphics.off()` can be used to close all the graphics windows.
+
+## Scales
+Whereas geoms define the method for representing relationships between data, *scales* control
+the mapping from data to visual properties such as colour, shape, position and size.
+These visual properties are referred to as aesthetics.
+
+For example consider the `msleep` dataset in the ggplot2 library.
+```{r warning = FALSE}
+gp <- ggplot(data=msleep,aes(x=bodywt,y=brainwt,size=sleep_total,colour=vore))
+gp <- gp + geom_point()
+gp <- gp + scale_x_continuous(name="Body Weight (kg)",trans="log10")
+gp <- gp + scale_y_continuous(name="Brain Weight (kg)",trans="log10")
+gp <- gp + scale_size_continuous(name="Sleep (hr)")
+gp <- gp + scale_color_discrete(name="Diet")
+gp
+```
+
+The above code overides the default positional scales for the x and y data with `log10` scales and provides meaningful names. The following code replaces the default discrete color scale with manual values where the color is matched to the diet type. 
+
+```{r message = FALSE}
+gp <- gp + scale_colour_manual(
+  name="Diet",values=c(
+    carni = 'red', herbi = 'green3', omni = 'brown', insecti = 'black'
+  )
+)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Create a new script called `ToothGrowth.R` and produce a plot of the `ToothGrowth` data for inclusion in a word report.")
+``` 
+
+The following ggplot2 functions might be helpful.
+```{r eval = FALSE}
+geom_jitter(position=position_jitter(width=0.1))
+expand_limits(x=c(0,2.5))
+```
+
+## Facets
+One of the most powerful features of the ggplot2 package is its ability to *facet* plots.  As an example consider the following plot. What does it suggest to you about the relationship between diet and sleep?
+```{r}
+gp <- ggplot(data=msleep,aes(x=bodywt,y=brainwt,size=sleep_total))
+gp <- gp + facet_grid(.~vore)
+gp <- gp + geom_point()
+gp <- gp + scale_x_continuous(name="Body Weight (kg)",trans="log10")
+gp <- gp + scale_y_continuous(name="Brain Weight (kg)",trans="log10")
+gp <- gp + scale_size_continuous(name="Sleep (hr)")
+print(gp)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Modify your `ToothGrowth.R` script so that it produces a second plot facetted by `supp`.")
+``` 
+
+## Themes
+The appearance of non-data elements in a ggplot plot is controlled
+by the theme system. To see the settings for the current theme type \verb`theme_get()`. To globally change to the black and white theme use the following code:
+```{r}
+theme_set(theme_bw())
+```
+
+Alternatively theme parameters can be set for specific ggplot objects using the \verb_theme()_
+function. The following code modifies the theme for the current object so that
+grid lines are not plotted
+```{r}
+gp <- gp + theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Alter your `ToothGrowth.R` script so that it produces a third plot using the black and white theme without grid lines.")
+``` 
+
+# Linear Models
+
+## Linear regression
+The basic linear regression model can be expressed as
+$$ y_{i} = \alpha +\beta x_{i} + \epsilon_{i} $$
+where $\alpha$ is the intercept and $\beta$ is the slope and the error terms ($\epsilon_{i}$) are independent and normally distributed with equal variance.
+
+The following code fits the basic linear regression model where `Volume` is the response and `Girth` is the  predictor for the `trees` data set and prints a summary of the model.
+```{r}
+mod<-lm(Volume~Girth,data=trees)
+summary(mod)
+```
+
+The model sumary indicates (among other things) that the intercept
+is `r round(coefficients(mod)[1],3)` and the slope
+is `r round(coefficients(mod)[2],3)`.
+
+## Fitted values
+A general approach for plotting the fitted values for any model is to
+generate the predicted values for a new data set that covers the range of values of interest and then add them to the plot. New data sets can be easily generated using the `new_data` function of the `datalist` package.
+```{r}
+library(datalist)
+newdata <- new_data(trees, "Girth")
+newdata$Volume <- predict(mod,newdata=newdata)
+
+gp <- ggplot(data=trees, aes(x=Girth,y=Volume))
+gp <- gp + geom_point()
+gp <- gp + geom_line(data=newdata)
+print(gp)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Step through the above code line by line and document what each line is doing.")
+``` 
+
+## Confidence intervals
+95% confidence intervals can added to the plot using the same approach.
+```{r}
+pred <- data.frame(predict(mod,newdata,interval="conf"))
+newdata <- cbind(newdata,pred)
+gp <- gp + geom_line(data=newdata,aes(y=lwr),linetype='dashed')
+gp <- gp + geom_line(data=newdata,aes(y=upr),linetype='dashed')
+print(gp)
+```
+
+## Prediction intervals
+Prediction intervals can be calculated by setting
+the `interval` argument in the `predict` function to be `"pred"`.
+Roughly speaking, confidence intervals represent the uncertainty surrounding the underlying relationship whereas prediction intervals represent the uncertainty surrounding new individual observations.
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Modify your `trees.R` script so that it fits a linear model to `Volume` against `Girth` and plots the observed data with 
+confidence and prediction intervals.")
+``` 
 
 # R Course Cheat Sheet
 
