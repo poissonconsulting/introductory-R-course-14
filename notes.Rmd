@@ -34,6 +34,7 @@ ktable <- function (...) {
   cat("\n")
 }
 
+options(repos = c("CRAN" = "http://cran.rstudio.com"))
 ```
 
 # Introduction
@@ -272,7 +273,9 @@ ls("package:stats")
 ```
 For a detailed description of how R searches and finds objects see http://obeautifulcode.com/R/How-R-Searches-And-Finds-Stuff/.
 
-To see all the packages that are currently installed on your computer go to the Packages window in the bottom right pane of RStudio. Packages that are currently loaded are selected. You can load a package by selecting it or by typing `library(package_name)` at the console.
+To see all the packages that are currently installed on your computer go to the Packages window in the bottom right pane of RStudio. Packages that are currently loaded are selected. 
+
+You can load a package by selecting it or by typing `library(package_name)` at the console.
 
 ```{r, echo = FALSE, results = 'asis'}
 exercise("Load the package `foreign`. What arguments does the function `read.dbf` in the
@@ -282,9 +285,25 @@ exercise("Load the package `foreign`. What arguments does the function `read.dbf
 To view the packages on the Comprehensive R Archive Network (CRAN) website that are currently available to install on your computer go to
 http://cran.r-project.org/web/packages/available_packages_by_name.html.
 
-You can install a package from the CRAN site onto your computer by clicking Install on the Packages window and typing its name alternatively type `install.packages("package_name")`.
+You can install a package from the CRAN site onto your computer by clicking Install on the Packages window and entering its name alternatively type `install.packages("package_name")`.
 ```{r, echo = FALSE, results = 'asis'}
 exercise("Install the package `ggplot2` onto your computer and then load it. What arguments does the function `ggplot` take.")
+```
+
+To install a package from a GitHub repository you need to first load the `devtools` package and then use the `install_github` function. 
+The following code demonstrates how to install (and load) version v0.4 of the 
+`datalist` package from <https://github.com/poissonconsulting/datalist>.
+
+```{r eval = FALSE, warning = FALSE}
+install.packages("devtools")
+library(devtools)
+install_github("poissonconsulting/datalist@v0.4")
+library(datalist)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Install the latest version of the `jaggernaut` package from GitHub at
+  <https://github.com/poissonconsulting/jaggernaut>. As it uses a number of GitHub packages you should follow the installation instructions on the README file.")
 ```
 
 ## Working Directory
@@ -342,11 +361,12 @@ exercise("What does the following R code do to the ToothGrowth data frame")
 install.packages("dplyr")
 library(dplyr)
 
-ToothGrowth <- filter(datasets::ToothGrowth, len < 30)
-ToothGrowth <- mutate(ToothGrowth, len2 = len * 2)
-ToothGrowth <- select(ToothGrowth, len2, supp, dose)
-ToothGrowth <- arrange(ToothGrowth, dose, supp, len2)
+ToothGrowth <- dplyr::filter(datasets::ToothGrowth, len < 30)
+ToothGrowth <- dplyr::mutate(ToothGrowth, len2 = len * 2)
+ToothGrowth <- dplyr::select(ToothGrowth, len2, supp, dose)
+ToothGrowth <- dplyr::arrange(ToothGrowth, dose, supp, len2)
 ```
+The code fragment `dplyr::` indicates that the following object must be taken from the dplyr package. This can be useful for ensuring R uses the correct object if multiple objects with the same name exist in different packages. Later I use it to remind the reader that a particular package must be loaded to run the code.
 
 If they were nested the operations would look like the following which is almost unreadable.
 ```{r, eval = FALSE}
@@ -549,7 +569,7 @@ A general approach for plotting the fitted values for any model is to
 generate the predicted values for a new data set that covers the range of values of interest and then add them to the plot. New data sets can be easily generated using the `new_data` function of the `datalist` package.
 ```{r}
 library(datalist)
-newdata <- new_data(trees, "Girth")
+newdata <- datalist::new_data(trees, "Girth")
 newdata$Volume <- predict(mod,newdata=newdata)
 
 gp <- ggplot(data=trees, aes(x=Girth,y=Volume))
@@ -615,10 +635,67 @@ mod <- lm(len ~ supp + dose, data = ToothGrowth)
 summary(mod)
 ```
 
-The model's coefficients indicate that the slope of the line is 9.76 and that `VC` is 3.7 less than `OJ`.
+The model's coefficients indicate that the slope of the line is `r round(coefficients(mod)[1],1)` and that `VC` is `r abs(round(coefficients(mod)[2],1))` less than `OJ`.
 
 ```{r, echo = FALSE, results = 'asis'}
 exercise("Are the model's residuals consistent with the assumed error structure?")
+```
+
+The fitted values for both levels of `supp` can be added to the scatterplot of
+`len` against `dose` using the same general approach as for the `tree` data set.
+
+```{r}
+newdata <- datalist::new_data(ToothGrowth, c("dose", "supp"))
+newdata$len <- predict(mod, newdata=newdata)
+
+gp <- ggplot(data=ToothGrowth,aes(x=dose,y=len,colour=supp))
+gp <- gp + geom_point(position=position_jitter(width=0.1))
+gp <- gp + geom_line(data=newdata,aes(group=supp))
+print(gp)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Modify your script so that it adds the predicted line for both levels of `supp` to the scatter plot of the `ToothGrowth` data using the previous code.")
+```
+
+The following code fits three additional models corresponding to the ANOVA model with just `supp`, the linear regression model with just `dose` and the ANCOVA model with an interaction between `dose` and `supp`.
+
+```{r}
+mod2 <- lm(len ~supp, data = ToothGrowth)
+mod3 <- lm(len ~ dose, data = ToothGrowth)
+mod4 <- lm(len ~ dose * supp, data = ToothGrowth)
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Modify your script so that it fits all four competing models and then each model's predictions (along with the raw data) in separate windows.")
+exercise("Which model provides the best fit to the data?
+Functions you might find useful are `anova` and `AIC`.")
+```
+
+# Model Formulae and Functions
+This section lists the various functions and formulae required to fit a range of linear, generalized linear, generalized additive, and generalized additive mixed models.
+```
+lm(y~1) # one sample t-test
+lm(y~x) # basic linear regression
+lm(y~fac) # one-way ANOVA
+lm(y~x-1) # basic linear regression through the origin (with no intercept term)
+lm(y~x+I(x^2)) # polynomial (quadratic) regression
+lm(y~x1+x2) # multiple regression
+lm(y~x1+x2+x1:x2) # multiple regression with interaction
+lm(y~fac1+fac2) # two-way ANOVA
+lm(y~x1+fac2) # ANCOVA
+nlme::lme(y~x1,random=~1|fac) # linear mixed model
+glm(y~x1,family=binomial) # logistic regression
+mgcv::gam(y~s(x),family=poisson) # generalized additive model
+mgcv::gamm(y~s(x),random=~1|fac,family=Gamma) # generalized additive mixed model
+```
+
+## Additional Analyses
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("Analyse the `chickwts` data set. To what extent is diet
+a predictor of body weight? Represent your model fit graphically.")
+exercise("Analyse the `msleep` data set in the `ggplot2` package. To what extent are body weight and diet predictors of brain weight? Are carnivores brainier than herbivores?")
 ```
 
 # R Course Cheat Sheet
