@@ -1,7 +1,7 @@
 ---
 title: "Introductory R Course"
-author: "Joe Thorley"
-date: "August 6, 2014"
+author: "Dr. Joseph L. Thorley R.P.Bio."
+date: "August 24^th^, 2014"
 output:
   pdf_document:
     number_sections: yes
@@ -39,8 +39,7 @@ options(repos = c("CRAN" = "http://cran.rstudio.com"))
 
 # Introduction
 
-The purpose of these course notes is to introduce participants to basic programming, graphics and statistics in R [@r_core_team_r:_2013] [@bradford_using_2005 pp. 23-34, and some]
-[-@royle_hierarchical_2008]. see @royle_hierarchical_2008 [pp. 33-45]
+The purpose of these course notes is to introduce participants to basic programming, graphics and statistics in R.
 
 ## R, S and S-Plus
 
@@ -73,8 +72,8 @@ exercise("What is the result of `3 * 4 + 5`? And `5 + 3 * 4`? What does this ind
 ## Precedence
 In R, if one operator has *precedence* over another then it is evaluated first. The order in which operators are evaluated can be controlled using brackets.
 ```{r}
-3 * 4 + 5
-3 * (4 + 5)
+2 * 3 + 4
+2 * (3 + 4)
 ```
 
 ```{r, echo = FALSE, results = 'asis'}
@@ -83,12 +82,12 @@ Demonstrate with an example.")
 ```
 
 ## Functions
-Most of R's functionality comes from its *functions*. A function takes zero, one or multiple *arguments*, depending on the function and returns a value. To call a function enter it's name followed by brackets - include any arguments in the brackets.
+Most of R's functionality comes from its *functions*. A function takes zero, one or multiple *arguments*, depending on the function, and returns a value. To call a function enter it's name followed by a pair of brackets - include any arguments in the brackets.
 ```{r}
 log(10)
 ```
 
-To find out more about a function `fun` type `?fun`. To search for the functions associated with a topic type `??topic` or `??"multiple topics"`.
+To find out more about a function called `function_name` type `?function_name`. To search for the functions associated with a topic type `??topic` or `??"multiple topics"`.
 
 ```{r, echo = FALSE, results = 'asis'}
 exercise("Which function calculates cumulative sums? And what arguments does it take?")
@@ -222,7 +221,7 @@ exercise("Coerce the factor `x` to a vector of class numeric. What happens?")
 *Data frames* are the fundamental data structure in R. A data frame is a two-dimensional data set where the columns are variables (vectors) of equal length.
 
 ### data
-R packages often include data sets.  To see the data sets in the current *search path}* (introducted later) type `data()`. To print a summary of the `trees` data frame type `summary(trees)`. Type `trees` to print the data frame itself. To get more information on `trees` type `?trees`.
+R packages often include data sets.  To see the data sets in the current *search path* (introducted later) type `data()`. To print a summary of the `trees` data frame type `summary(trees)`. Type `trees` to print the data frame itself. To get more information on `trees` type `?trees`.
 
 ```{r, echo = FALSE, results = 'asis'}
 exercise("What are the data in the `ToothGrowth` data set?")
@@ -248,7 +247,7 @@ exercise("Add a column `Diameter` to `trees` bearing in mind that `pi` is the ra
 # RStudio
 
 Thus far you have been using R through its Graphical User Interface (GUI).
-However a number of third-party programs provide more powerful Integrated Development Environments (IDEs) for interfacing with R. My favourite is RStudio the desktop version of which can be downloaded from http://rstudio.org/download/desktop. Like R, RStudio is free and open source. The remainder of this course is taught assuming you are using RStudio.
+However a number of third-party programs provide more powerful Integrated Development Environments (IDEs) for interfacing with R. I recommend RStudio - the desktop version of which can be downloaded from http://rstudio.org/download/desktop. Like R, RStudio is free and open source. The remainder of this course is taught assuming you are using RStudio.
 
 ## Console
 By default the pane in the bottom left of RStudio is the R console. You can enter expressions in the console in the same way you have been entering expressions in the R console in the R GUI.
@@ -273,24 +272,25 @@ ls("package:stats")
 ```
 For a detailed description of how R searches and finds objects see http://obeautifulcode.com/R/How-R-Searches-And-Finds-Stuff/.
 
-To see all the packages that are currently installed on your computer go to the Packages window in the bottom right pane of RStudio. Packages that are currently loaded are selected. 
+To see all the packages that are currently *installed* on your computer go to the Packages window in the bottom right pane of RStudio. Packages that are currently loaded are selected. 
 
-You can load a package by selecting it or by typing `library(package_name)` at the console.
+You can load an installed package by selecting it or by typing `library(package_name)` at the console.
 
 ```{r, echo = FALSE, results = 'asis'}
-exercise("Load the package `foreign`. What arguments does the function `read.dbf` in the
+exercise("Load the package `foreign`. What arguments does the 
+  function `read.dbf` in the
 `foreign` package take?")
 ```
 
 To view the packages on the Comprehensive R Archive Network (CRAN) website that are currently available to install on your computer go to
 http://cran.r-project.org/web/packages/available_packages_by_name.html.
 
-You can install a package from the CRAN site onto your computer by clicking Install on the Packages window and entering its name alternatively type `install.packages("package_name")`.
+You can install a package from the CRAN site onto your computer by clicking Install on the Packages window and entering its name or alternatively by typing `install.packages("package_name")`?
 ```{r, echo = FALSE, results = 'asis'}
 exercise("Install the package `ggplot2` onto your computer and then load it. What arguments does the function `ggplot` take.")
 ```
 
-To install a package from a GitHub repository you need to first load the `devtools` package and then use the `install_github` function. 
+Other packages are available from [GitHub](https://github.com/). To install a package from a GitHub repository you need to first load the `devtools` package and then use the `install_github` function. 
 The following code demonstrates how to install (and load) version v0.4 of the 
 `datalist` package from <https://github.com/poissonconsulting/datalist>.
 
@@ -303,7 +303,7 @@ library(datalist)
 
 ```{r, echo = FALSE, results = 'asis'}
 exercise("Install the latest version of the `jaggernaut` package from GitHub at
-  <https://github.com/poissonconsulting/jaggernaut>. As it uses a number of GitHub packages you should follow the installation instructions on the README file.")
+  <https://github.com/poissonconsulting/jaggernaut>. As it uses a number of GitHub packages you should follow the installation instructions on the [README](https://github.com/poissonconsulting/jaggernaut/blob/master/README.md) file.")
 ```
 
 ## Working Directory
@@ -337,9 +337,11 @@ a csv file called `ToothGrowthMissing`.
 write.csv(datasets::ToothGrowth, "ToothGrowthMissing.csv", row.names = FALSE)
 ```
 
+The code fragment `datasets::` indicates that the following object must be taken from the datasets package. This can be useful for ensuring R uses the correct object if multiple objects with the same name exist in different packages. Later I use it to remind the reader that a particular package must be loaded to run the code.
+
+
 ```{r, echo = FALSE, results = 'asis'}
-exercise("Run the line of code above and then open the ToothGrowthMissing csv file in a spreadsheet program and replace the first five values in the `len` column with `NA`.")
-exercise("Now use the `read.csv` function to import the ToothGrowthMissing csv file into the workspace. Use the `na.omit` function to delete the 
+exercise("Run the line of code above and then open the ToothGrowthMissing csv file in a spreadsheet program and replace the first five values in the `len` column with `NA`. Now use the `read.csv` function to import the ToothGrowthMissing csv file into the workspace. Use the `na.omit` function to delete the 
 missing values. What happens to the data frame when the missing values are deleted?")
 ```
 
@@ -354,27 +356,26 @@ functions are:
 - mutate: add new columns
 
 ```{r, echo = FALSE, results = 'asis'}
-exercise("What does the following R code do to the ToothGrowth data frame")
+exercise("What does each of the following lines of R code do to the ToothGrowth data frame?")
 ```
 
 ```{r, eval = FALSE}
 install.packages("dplyr")
 library(dplyr)
 
-ToothGrowth <- dplyr::filter(datasets::ToothGrowth, len < 30)
-ToothGrowth <- dplyr::mutate(ToothGrowth, len2 = len * 2)
-ToothGrowth <- dplyr::select(ToothGrowth, len2, supp, dose)
-ToothGrowth <- dplyr::arrange(ToothGrowth, dose, supp, len2)
+ToothGrowth <- filter(datasets::ToothGrowth, len < 30)
+ToothGrowth <- mutate(ToothGrowth, len2 = len * 2)
+ToothGrowth <- select(ToothGrowth, len2, supp, dose)
+ToothGrowth <- arrange(ToothGrowth, dose, supp, len2)
 ```
-The code fragment `dplyr::` indicates that the following object must be taken from the dplyr package. This can be useful for ensuring R uses the correct object if multiple objects with the same name exist in different packages. Later I use it to remind the reader that a particular package must be loaded to run the code.
 
-If they were nested the operations would look like the following which is almost unreadable.
+If the functions were nested the code would look like the following which is almost unreadable.
 ```{r, eval = FALSE}
 ToothGrowth <- arrange(select(mutate(filter(datasets::ToothGrowth, len < 30), len2 = len * 2), 
   len2, supp, dose), dose, supp, len2)
 ```
 
-To improve readibility, the same operations can be joined in left to right order using the forward-pipe operator `%>%` in the `magrittr` package
+To improve readability, the same operations can be joined in left to right order using the forward-pipe operator `%>%` in the `magrittr` package
 to 
 ```{r, eval = FALSE}
 install.packages("magrittr")
@@ -390,7 +391,7 @@ ToothGrowth <- datasets::ToothGrowth %>% filter(len < 30) %>% mutate(len2 = len 
 Rather than entering expressions into R one by one at the command line, 
 a more efficient method is to type the expressions into a text file 
 called a *script* and then send all of them to R at the same time. 
-R scripts are indicated by the suffix `.r` or `.R`.
+R scripts are indicated by the suffix `.R` or less commonly `.r`.
 
 Open a new script using the R Script suboption of the New option in the File menu. Next paste the following expressions into the script.
 ```{r, eval=FALSE}
@@ -398,10 +399,10 @@ Open a new script using the R Script suboption of the New option in the File men
 graphics.off()
 rm(ls=objects())
 
-summary(trees)
+summary(datasets::trees)
 ```
 
-Now save the script in your working directory as `trees.r`. Finally type Command-A to select the entire script then Command-Enter to send it to the console.
+Now save the script in your working directory as `trees.R`. Finally type Command-A to select the entire script then Command-Enter to send it to the console.
 
 Congratulations you've written and executed your first script. The first line is a comment - R ignores it. The second line closes any open graphics windows while the second line removes all objects from the workspace so that the script is starting with a blank slate.
 
@@ -412,12 +413,13 @@ converts a temperature in farenheit ($F$) to celsius ($C$).
 $$ C = (F - 32) * 5 / 9$$
 
 ```{r, echo = FALSE, results = 'asis'}
-exercise("Append code to the `trees.r` script to convert 45 farenheit to celcius.
+exercise("Append code to the `trees.R` script to convert 45 farenheit to celcius.
   Note The correct answer is 7.22.")
 
 exercise("Now use the code to convert the following temperatures in farenheit to celcius:
-  0 , 32, 64, 100.")
+  0 , 32, 64 and 100.")
 ```
+
 For further information on R coding style see http://stat405.had.co.nz/r-style.html.
 
 ## Functions
@@ -436,15 +438,15 @@ converts `farenheit` to `kelvin` while the second and last line tells the
 function to return the value of `kelvin`.
 
 Paste the code into a script and then run it. R does nothing because executing the code
-simply defines the function. Look in your workspace (`ls()`) and you will see
+simply defines the function. List the contents of your workspace  using `ls()` and you will see
 `farenheit_to_kelvin` present. If you type `farenheit_to_kelvin` R will print 
 the object for you which in this case is the function definition. 
-To call the function you have to follow 
+To call the function you have to remember to follow 
 its name with paired brackets that include any arguments you wish to pass to the function, i.e., `farenheit_to_kelvin(c(0, 32))`.
 
 # Graphics
 The `ggplot2` library provides a family of functions for producing high-quality graphics within
-a unified conceptual framework. 
+a unified conceptual framework.
 
 ## Geoms
 The following code produces a scatterplot of `Volume` on the
@@ -454,7 +456,7 @@ the second line specifies the data and relationships of interest. The third line
 
 ```{r}
 library(ggplot2)
-gp <- ggplot(data = trees, aes(x = Girth, y = Volume))
+gp <- ggplot(data = datasets::trees, aes(x = Girth, y = Volume))
 gp <- gp + geom_point()
 print(gp)
 ```
@@ -468,7 +470,7 @@ The available geoms are documented at <http://docs.ggplot2.org/current/>.
 
 ## Windows
 By default plots are printed to the Plots window in the bottom right pane of RStudio. To create a new graphics window use the
-`windows()` function, where by default the width and height are both 7 inches. If working on a Mac using the `quartz()` function instead.
+`windows()` function, where by default the width and height are both 7 inches. If working with the Mac or Linux Operating systems use the `quartz()` or `X11()` function, respectively.
 
 The most recent ggplot object to have been created or modified or plotted can be saved in the working
 directory using the `ggsave` function.
@@ -561,8 +563,8 @@ summary(mod)
 ```
 
 The model sumary indicates (among other things) that the intercept
-is `r round(coefficients(mod)[1],3)` and the slope
-is `r round(coefficients(mod)[2],3)`.
+is `r round(coefficients(mod)[1], 1)` and the slope
+is `r round(coefficients(mod)[2], 1)`.
 
 ## Fitted values
 A general approach for plotting the fitted values for any model is to
