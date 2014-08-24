@@ -3,3 +3,6 @@
 .RData
 
 *.pdf
+*.html
+*.md
+introductory-R_files
