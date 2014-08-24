@@ -8,7 +8,6 @@ output:
     toc: yes
   html_document:
     toc: yes
-bibliography: references.bib
 ---
 
 ```{r,echo = FALSE}
@@ -214,7 +213,7 @@ class(x)
 ```
 
 ```{r, echo = FALSE, results = 'asis'}
-exercise("Coerce the factor `x` to a vector of class numeric. What happens?")
+exercise("Coerce the factor `x` to a vector of class numeric using `as.numeric`. What happens?")
 ```
 
 ## Data Frames
@@ -364,9 +363,9 @@ install.packages("dplyr")
 library(dplyr)
 
 ToothGrowth <- filter(datasets::ToothGrowth, len < 30)
-ToothGrowth <- mutate(ToothGrowth, len2 = len * 2)
-ToothGrowth <- select(ToothGrowth, len2, supp, dose)
-ToothGrowth <- arrange(ToothGrowth, dose, supp, len2)
+ToothGrowth <- mutate(datasets::ToothGrowth, len2 = len * 2)
+ToothGrowth <- select(datasets::ToothGrowth, len2, supp, dose)
+ToothGrowth <- arrange(datasets::ToothGrowth, dose, supp, len2)
 ```
 
 If the functions were nested the code would look like the following which is almost unreadable.
@@ -452,11 +451,12 @@ a unified conceptual framework.
 The following code produces a scatterplot of `Volume` on the
 y-axis against `Girth` on the x-axis for the `trees` data frame.
 The first line of code loads the `ggplot2` library while
-the second line specifies the data and relationships of interest. The third line indicates the method (geom) for representing the relationships among the data while the last line plots the ggplot object (in this case `gp`).
+the second line specifies the data and relationships of interest. The third line indicates the method (geom) for representing the relationships among the data while the last line plots the ggplot object (in this case `gp`). Note: the same plot can be produced using the `ggplot2::qplot` wrapper function thus
+`qplot(Girth, Volume, data = trees)`.
 
 ```{r}
 library(ggplot2)
-gp <- ggplot(data = datasets::trees, aes(x = Girth, y = Volume))
+gp <- ggplot(data = trees, aes(x = Girth, y = Volume))
 gp <- gp + geom_point()
 print(gp)
 ```
@@ -517,7 +517,7 @@ expand_limits(x=c(0,2.5))
 
 ## Facets
 One of the most powerful features of the ggplot2 package is its ability to *facet* plots.  As an example consider the following plot. What does it suggest to you about the relationship between diet and sleep?
-```{r}
+```{r, warning = FALSE}
 gp <- ggplot(data=msleep,aes(x=bodywt,y=brainwt,size=sleep_total))
 gp <- gp + facet_grid(.~vore)
 gp <- gp + geom_point()
@@ -604,19 +604,24 @@ exercise("Modify your `trees.R` script so that it fits a linear model to `Volume
 confidence and prediction intervals.")
 ``` 
 
-## Residual plots
+## Model Fit
 A linear regression model is only valid if its residuals are consistent with the assumed error structure.
 A diagnostic plot can be produced using the following code.
 
 ```{r message = FALSE}
-ggplot(mod, aes(.fitted, .resid)) + 
-geom_hline(yintercept = 0) + 
-geom_point() +
-geom_smooth(se = FALSE)
+qplot(.fitted, .stdresid, data = mod) + 
+  geom_hline(yintercept = 0) + geom_smooth(se = FALSE)
 ```
 
 ```{r, echo = FALSE, results = 'asis'}
 exercise("What does the previous diagnostic plot suggest to you?")
+```
+
+The previous code works because the `fortify` function has been defined for `lm` objects. For further examples of diagnostic plots see <http://docs.ggplot2.org/current/fortify.lm.html>.
+
+The relationship between `Volume` and `Girth` is expected to be [allometric](http://www.nature.com/scitable/knowledge/library/allometry-the-study-of-biological-scaling-13228439) because the cross-sectional area at an given point scales to the square of the girth (circumference).
+
+```{r, echo = FALSE, results = 'asis'}
 exercise("Try fitting an allometric relationship by `log` transforming
 `Volume` and `Girth` and then using the same basic linear regression model.
 Does the diagnostic plot suggest an improvement in
@@ -663,7 +668,7 @@ exercise("Modify your script so that it adds the predicted line for both levels 
 The following code fits three additional models corresponding to the ANOVA model with just `supp`, the linear regression model with just `dose` and the ANCOVA model with an interaction between `dose` and `supp`.
 
 ```{r}
-mod2 <- lm(len ~supp, data = ToothGrowth)
+mod2 <- lm(len ~ supp, data = ToothGrowth)
 mod3 <- lm(len ~ dose, data = ToothGrowth)
 mod4 <- lm(len ~ dose * supp, data = ToothGrowth)
 ```
@@ -705,33 +710,94 @@ exercise("Analyse the `msleep` data set in the `ggplot2` package. To what extent
 ```{r, echo = FALSE, results = 'asis'}
 
 ktable("Operator" = "Description",
-        "`*`" = "Multiplication. *Usage*: `5 * 3`",
+        "`*`" = "Multiplication. *Usage*: `x * y`",
         "`/`" = "Division. *Usage*: `x / y`",
-        "`+`" = "Addition. *Usage*: `4 + 3`",
-        "`-`" = "Subtraction. *Usage*: `x - 5`",
-        "`^`" = "Power. *Usage*: `6^3`",
-        "`<-`" = "Assignment. *Shortcut*: **alt-**. *Usage*: `x <- 5`",
-        "`(`" = "Bracket. *Usage*: `2*(3+5)`",
-        "`?`" = "Help file. *Usage*: `?function`",
-        "`??`" = "Search help files. *Usage*: `??topic`"
+        "`+`" = "Addition. *Usage*: `x + y`",
+        "`-`" = "Subtraction. *Usage*: `x - y`",
+        "`^`" = "Power. *Usage*: `x^y`",
+        "`<-`" = "Assignment. *Shortcut*: **alt-**. *Usage*: `x <- y`",
+        "`(`" = "Bracket. *Usage*: `x*(y+z)`",
+        "`?`" = "Help file. *Usage*: `?function_name`",
+        "`??`" = "Search help files. *Usage*: `??topic`",
+        "`;`" = "Separate lines. *Usage*: `x <- 1; y <- 2`",
+        "`::`" = "Specify package of object. *Usage*: `datasets::trees`",        
+        "`magrittr::%>%`" = "Forward pipe operations. *Useage*: `x %>% sum()`",
+        "`$`" = "Reference column in data.frame. *Useage*: `x$y`"
   )
 
 ktable("Math Function" = "Description",
-        "`log`" = "Logarithm. *Usage*: `log(x)`",
+        "`log`" = "Logarithm. *Usage*: `log(x, base = 10)`",
         "`exp`" = "Exponential. *Usage*: `exp(x)`",
         "`cumsum`" = "Cumulative sum. *Usage*: `cumsum(x)`",
-        "`sqrt`" = "Square-root. *Usage*: `sqrt(9)`"
+        "`sqrt`" = "Square-root. *Usage*: `sqrt(x)`",
+        "`mean`" = "Average. *Usage*: `mean(x, na.rm = TRUE)`"
   )
 
 ktable("Vector Function" = "Description",
-        "`c`" = "Concatenate. *Usage*: `c(1, 3)`",
+        "`c`" = "Concatenate. *Usage*: `c(1, -3, 5)`",
         "`seq`" = "Sequence. *Usage*: `seq(1, 4)`",
-        "`length`" = "Length. *Usage*: `length(c(1, 2, 3, 4))`"
+        "`length`" = "Length. *Usage*: `length(seq(2, 5))`",
+        "`as.factor`" = "Coerce to factor. *Useage*: `as.factor(x)`",
+        "`as.numeric`" = "Coerce to numeric. *Useage*: `as.factor(x)`"
   )
 
-ktable("Other Function" = "Description",
-        "`objects`" = "Objects in workspace. *Usage*: `objects(); objects(2)`. Alias: `ls`",
-        "`remove`" = "Remove object(s) from workspace. *Usage*: `remove(list = ls())`"
+ktable("data.frame Function" = "Description",
+        "`data`" = "List available data sets.",
+        "`write.csv`" = "Output as csv file.",
+        "`read.csv`" = "Input from csv file.",
+        "`na.omit`" = "Delete missing values.",
+        "`dplyr::filter`" = "Chose a subset of rows based on conditions.",
+        "`dplyr::mutate`" = "Add new columns.",
+        "`dplyr::select`" = "Chose a subset of columns based on names.",
+        "`dplyr::arrange`" = "Sort rows.",
+        "`datalist::new_data`" = "Dummy data set.",
+        "`cbind`" = "Combine two data.frames by columns.",
+        "`data.frame`" = "Create data.frame."
+  )
+
+ktable("Graphics Function" = "Description",
+        "`ggplot2::ggplot`" = "Set data.frame and aesthetic mappings for ggplot graphic object.",
+        "`ggplot2::geom_point`" = "Represent values with points.",
+        "`ggplot2::geom_line`" = "Represent values with lines.",
+        "`windows`" = "New graphics window. Use `quartz()` or `X11()` for OSX or linux",
+        "`graphics.off`" = "Close all graphics windows.",
+        "`ggplot2::ggsave`" = "Save current plot.",
+        "`ggplot2::scale_x_continuous`" = "Set continuous x position scale attributes.",
+        "`ggplot2::scale_y_continuous`" = "Set continuous y position scale attributes.",
+        "`ggplot2::scale_size_continuous`" = "Set continuous size scale attributes.",
+        "`ggplot2::scale_color_discrete`" = "Set discrete color scale attributes.",
+        "`ggplot2::scale_color_manual`" = "Set manual color scale attributes.",
+        "`ggplot2::geom_jitter`" = "Represent values with points plus random spread.",
+        "`ggplot2::expand_limits`" = "Expand scale limits to include specified values.",
+        "`ggplot2::facet_grid`" = "Break plot into facets by variables.",
+        "`ggplot2::theme_get`" = "Get current theme for graphics.",
+        "`ggplot2::theme_set`" = "Set current theme for graphics.",
+        "`ggplot2::theme`" = "Set theme element for current graphic object.",
+        "`ggplot2::element_blank`" = "Blank value for a theme element.",
+        "`ggplot2::qplot`" = "Quick wrapper for ggplot and geom_point.",
+        "`ggplot2::geom_smooth`" = "Represent values with smoothers.",
+        "`ggplot2::geom_hline`" = "Represent values with horizontal lines."
+  )
+
+ktable("Model Function" = "Description",
+        "`lm`" = "Fit linear model. *Useage*: `lm(y ~ x, data = data)`",
+        "`predict`" = "Predict response values for model.",
+        "`anova`" = "Analysis of variance tables for one or more models.",
+        "`AIC`" = "Akaike's Information Criterion for one or more models."
+  )
+  
+ktable("General Function" = "Description",
+        "`ls`" = "Objects in workspace or package. *Usage*: `ls(); ls(2)`",
+        "`rm`" = "Remove object(s) from workspace. *Usage*: `rm(x)`; `rm(list = ls())`",
+        "`class`" = "Class of object. *Usage*: `class(x)`",
+        "`search`" = "Loaded packages. *Useage*: `search()`",
+        "`library`" = "Load installed package. *Useage*: `library(package_name)`",
+        "`install.packages`" = "Install package(s) from CRAN. *Useage*: `install.packages('pkg_name')`",
+        "`devtools::install_github`" = "Install package from GitHub.",
+        "`getwd`" = "Get working directory. *Useage*: `getwd()`.",
+        "`setwd`" = "Set working directory. *Useage*: `setwd('path_to_dir')`",
+        "`summary`" = "Summary of object. *Useage*: `summary(x)`",
+        "`print`" = "Print to console or draw graphics object in window"
   )
 
 ```
