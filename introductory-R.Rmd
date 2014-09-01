@@ -11,7 +11,7 @@ output:
     toc: yes
 ---
 
-```{r,echo = FALSE}
+```{r,echo = FALSE, results='asis'}
 
 library(knitr)
 
@@ -35,11 +35,27 @@ ktable <- function (...) {
 }
 
 options(repos = c("CRAN" = "http://cran.rstudio.com"))
+
+fig_width <- 4
+fig_height <- fig_width
+
+fn = local({
+  i <- 0
+  function(x) {
+    i <<- i + 1
+    paste0("Figure ", i, ": ", x)
+  }
+})
+
 ```
 
-# Introduction
+# Background
 
 The purpose of these course notes is to introduce participants to basic programming, graphics and statistics in R.
+
+The notes, which are released under a [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/deed.en_US) license, are a draft of the material to be presented at the [Introductory R Course](/courses/2014/04/02/rcourse.html) in Kelowna on November 18^th^-19^th^, 2014. They were written by [Dr. Joseph Thorley R.P.Bio.](http://www.poissonconsulting.ca/people/joe-thorley.html).
+
+They are available [online](http://www.poissonconsulting.ca/temporary-hidden-link-3423423234/courses/introductory-R.html) and as a [pdf](introductory-R.pdf).
 
 ## R, S and S-Plus
 
@@ -47,7 +63,7 @@ R and S-PLUS are both implementations for the S language which is a language for
 
 ## Installation
 
-Download the the most recent version of the base distribution binary for your platform from http://cran.r-project.org/ and install using the default options. Then start up R.
+Download the the most recent version of the base distribution binary for your platform from <http://cran.r-project.org/> and install using the default options. Then start up R.
 
 # R Basics
 
@@ -247,7 +263,7 @@ exercise("Add a column `Diameter` to `trees` bearing in mind that `pi` is the ra
 # RStudio
 
 Thus far you have been using R through its Graphical User Interface (GUI).
-However a number of third-party programs provide more powerful Integrated Development Environments (IDEs) for interfacing with R. I recommend RStudio - the desktop version of which can be downloaded from http://rstudio.org/download/desktop. Like R, RStudio is free and open source. The remainder of this course is taught assuming you are using RStudio.
+However a number of third-party programs provide more powerful Integrated Development Environments (IDEs) for interfacing with R. I recommend RStudio - the desktop version of which can be downloaded from <http://rstudio.org/download/desktop>. Like R, RStudio is free and open source. The remainder of this course is taught assuming you are using RStudio.
 
 ## Console
 By default the pane in the bottom left of RStudio is the R console. You can enter expressions in the console in the same way you have been entering expressions in the R console in the R GUI.
@@ -331,17 +347,22 @@ exercise("Create a new project called RCourse in the RCourse folder on your desk
 The simplest way to input and output data is in the form of comma separated files. Comma separated files, which have the suffix **.csv**, are recognised by almost all
 statistical and spreadsheet programs including \verb_R_.
 
-The following line of code saves the ToothGrowth data frame in the datasets package to the working directory as 
-a csv file called `ToothGrowthMissing`.
+The following code creates a `data.frame` stocks, prints the first 6 rows using `head()` and saves it to the working directory as a csv file called `StocksMissing`.
 ```{r, eval = FALSE}
-write.csv(datasets::ToothGrowth, "ToothGrowthMissing.csv", row.names = FALSE)
+stocks <- data.frame(
+  time = 1:10,
+  X = seq(-2,3, length.out = 10),
+  Y = 3:12,
+  Z = -10:-1
+)
+
+head(stocks)
+
+write.csv(stocks, "StocksMissing.csv", row.names = FALSE)
 ```
 
-The code fragment `datasets::` indicates that the following object must be taken from the datasets package. This can be useful for ensuring R uses the correct object if multiple objects with the same name exist in different packages. Later I use it to remind the reader that a particular package must be loaded to run the code.
-
-
 ```{r, echo = FALSE, results = 'asis'}
-exercise("Run the line of code above and then open the ToothGrowthMissing csv file in a spreadsheet program and replace the first five values in the `len` column with `NA`. Now use the `read.csv` function to import the ToothGrowthMissing csv file into the workspace. Use the `na.omit` function to delete the 
+exercise("Run the line of code above and then open the StocksMissing csv file in a spreadsheet program and replace the first five values in the `X` column with `NA`. Now use the `read.csv` function to import the ToothGrowthMissing csv file into the workspace. Use the `na.omit` function to delete the 
 missing values. What happens to the data frame when the missing values are deleted?")
 ```
 
@@ -369,6 +390,8 @@ ToothGrowth <- select(datasets::ToothGrowth, len2, supp, dose)
 ToothGrowth <- arrange(datasets::ToothGrowth, dose, supp, len2)
 ```
 
+The code fragment `datasets::` indicates that the following object must be taken from the datasets package. This can be useful for ensuring R uses the correct object if multiple objects with the same name exist in the search path. Later I use it to remind the reader that a particular package must be loaded to run the code.
+
 If the functions were nested the code would look like the following which is almost unreadable.
 ```{r, eval = FALSE}
 ToothGrowth <- arrange(select(mutate(filter(datasets::ToothGrowth, len < 30), len2 = len * 2), 
@@ -383,6 +406,39 @@ library(magrittr)
 
 ToothGrowth <- datasets::ToothGrowth %>% filter(len < 30) %>% mutate(len2 = len * 2) %>% 
   select(len2, supp, dose) %>% arrange(dose, supp, len2)
+```
+
+The `dplyr` functions together with those in the `tidyr` package can be used to 
+to clean and tidy data where 
+
+> [data cleaning focusses on observations and data tidying focusses on variables](https://twitter.com/hadleywickham/status/503923762111070209)
+
+In [tidy data](https://github.com/jtleek/datasharing#the-tidy-data-set):
+
+1. Each variable forms a column.
+1. Each observation forms a row.
+1. Each type of observational unit forms a table.
+1. Multiple tables include a column(s) that allow them to be linked.
+
+The following code uses the `tidyr::gather` function to convert the `stocks` data frame from wide to long format so that it now satisfies the first condition. 
+```{r}
+install.packages("tidyr")
+library(tidyr)
+stocks <- data.frame( time = 1:10, X = seq(-2,3, length.out = 10),
+  Y = 3:12, Z = -10:-1)
+
+head(stocks)
+stocks <- gather(stocks, stock, price, -time)
+head(stocks)
+```
+
+The complement to `tidyr::gather()` is the `tidyr::spread` function.
+```{r}
+head(spread(stocks, stock, price))
+```
+
+```{r, echo = FALSE, results = 'asis'}
+exercise("What happens if you filter negative prices from the gathered `stocks` data frame before spreading?")
 ```
 
 # Programming
@@ -455,7 +511,7 @@ The first line of code loads the `ggplot2` library while
 the second line specifies the data and relationships of interest. The third line indicates the method (geom) for representing the relationships among the data while the last line plots the ggplot object (in this case `gp`). Note: the same plot can be produced using the `ggplot2::qplot` wrapper function thus
 `qplot(Girth, Volume, data = trees)`.
 
-```{r}
+```{r, fig.width = fig_width, fig.height = fig_height, fig.cap = fn("Volume against Height for black cherry trees")}
 library(ggplot2)
 gp <- ggplot(data = trees, aes(x = Girth, y = Volume))
 gp <- gp + geom_point()
@@ -486,7 +542,7 @@ the mapping from data to visual properties such as colour, shape, position and s
 These visual properties are referred to as aesthetics.
 
 For example consider the `msleep` dataset in the ggplot2 library.
-```{r warning = FALSE}
+```{r warning = FALSE, fig.width = fig_width * 1.5, fig.height = fig_height, fig.cap = fn("Body weight against brain weight for various mammal species.")}
 gp <- ggplot(data=msleep,aes(x=bodywt,y=brainwt,size=sleep_total,colour=vore))
 gp <- gp + geom_point()
 gp <- gp + scale_x_continuous(name="Body Weight (kg)",trans="log10")
@@ -518,7 +574,7 @@ expand_limits(x=c(0,2.5))
 
 ## Facets
 One of the most powerful features of the ggplot2 package is its ability to *facet* plots.  As an example consider the following plot. What does it suggest to you about the relationship between diet and sleep?
-```{r, warning = FALSE}
+```{r, warning = FALSE, fig.width = fig_width * 2, fig.height = fig_height, fig.cap = fn("Body weight against brain weight by diet for various mammal species.")}
 gp <- ggplot(data=msleep,aes(x=bodywt,y=brainwt,size=sleep_total))
 gp <- gp + facet_grid(.~vore)
 gp <- gp + geom_point()
@@ -570,7 +626,7 @@ is `r round(coefficients(mod)[2], 1)`.
 ## Fitted values
 A general approach for plotting the fitted values for any model is to
 generate the predicted values for a new data set that covers the range of values of interest and then add them to the plot. New data sets can be easily generated using the `new_data` function of the `datalist` package.
-```{r}
+```{r, fig.width = fig_width, fig.height = fig_height, fig.cap = fn("Estimated relationship between Volume and Girth for black cherry trees.")}
 library(datalist)
 newdata <- datalist::new_data(trees, "Girth")
 newdata$Volume <- predict(mod,newdata=newdata)
@@ -587,7 +643,7 @@ exercise("Step through the above code line by line and document what each line i
 
 ## Confidence intervals
 95% confidence intervals can added to the plot using the same approach.
-```{r}
+```{r, fig.width = fig_width, fig.height = fig_height, fig.cap = fn("Estimated relationship between Volume and Girth for black cherry trees with 95% confidence intervals.")}
 pred <- data.frame(predict(mod,newdata,interval="conf"))
 newdata <- cbind(newdata,pred)
 gp <- gp + geom_line(data=newdata,aes(y=lwr),linetype='dashed')
@@ -609,7 +665,7 @@ confidence and prediction intervals.")
 A linear regression model is only valid if its residuals are consistent with the assumed error structure.
 A diagnostic plot can be produced using the following code.
 
-```{r message = FALSE}
+```{r message = FALSE, fig.width = fig_width, fig.height = fig_height, fig.cap = fn("Standardised residuals against fitted values for model of Volume against Girth for black cherry trees.")}
 qplot(.fitted, .stdresid, data = mod) + 
   geom_hline(yintercept = 0) + geom_smooth(se = FALSE)
 ```
@@ -652,7 +708,7 @@ exercise("Are the model's residuals consistent with the assumed error structure?
 The fitted values for both levels of `supp` can be added to the scatterplot of
 `len` against `dose` using the same general approach as for the `tree` data set.
 
-```{r}
+```{r, fig.width = fig_width * 1.5, fig.height = fig_height, fig.cap = fn("Estimated relationship between tooth length, dose and supplement for guinea pigs fed Vitamin C.")}
 newdata <- datalist::new_data(ToothGrowth, c("dose", "supp"))
 newdata$len <- predict(mod, newdata=newdata)
 
@@ -752,6 +808,9 @@ ktable("data.frame Function" = "Description",
         "`dplyr::select`" = "Chose a subset of columns based on names.",
         "`dplyr::arrange`" = "Sort rows.",
         "`datalist::new_data`" = "Dummy data set.",
+        "`head`" = "Chose first six rows.",
+        "`tidyr::gather`" = "Convert from wide to long format",
+        "`tidyr::spread`" = "Convert from long to wide format",        
         "`cbind`" = "Combine two data.frames by columns.",
         "`data.frame`" = "Create data.frame."
   )
