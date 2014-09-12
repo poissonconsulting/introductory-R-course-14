@@ -1,7 +1,7 @@
 ---
 title: "Introductory R Course"
-author: "Dr. Joseph L. Thorley R.P.Bio."
-date: "August 24^th^, 2014"
+author: "Dr. Joseph L. Thorley"
+date: "September 12^th^, 2014"
 output:
   html_document:
     keep_md: yes
@@ -14,6 +14,8 @@ output:
 ```{r,echo = FALSE, results='asis'}
 
 library(knitr)
+opts_chunk$set(tidy = TRUE)
+options(width = 80)
 
 exercise_number <- 0
 exercise <- function (txt) {
@@ -68,10 +70,11 @@ Download the the most recent version of the base distribution binary for your pl
 # R Basics
 
 ## Calculations
-R can be used just like a calculator. An expression is entered at the `>` prompt and the result printed.
+R can be used just like a calculator. An expression is entered at the `>` prompt and the result printed (the `print` command is redundant).
 ```{r}
 3 + 4
 3 * 4
+print( 1 / 4)
 ```
 
 To faciliate cut and paste the R code in this document is not preceded by the `>` prompt and any output is preceded by two comment characters `##` (comments are introduced below).
@@ -362,7 +365,7 @@ write.csv(stocks, "StocksMissing.csv", row.names = FALSE)
 ```
 
 ```{r, echo = FALSE, results = 'asis'}
-exercise("Run the line of code above and then open the StocksMissing csv file in a spreadsheet program and replace the first five values in the `X` column with `NA`. Now use the `read.csv` function to import the ToothGrowthMissing csv file into the workspace. Use the `na.omit` function to delete the 
+exercise("Run the line of code above and then open the StocksMissing csv file in a spreadsheet program and replace the first five values in the `X` column with `NA`. Now use the `read.csv` function to import the StocksMissing csv file into the workspace. Use the `na.omit` function to delete the 
 missing values. What happens to the data frame when the missing values are deleted?")
 ```
 
@@ -386,8 +389,8 @@ library(dplyr)
 
 ToothGrowth <- filter(datasets::ToothGrowth, len < 30)
 ToothGrowth <- mutate(datasets::ToothGrowth, len2 = len * 2)
-ToothGrowth <- select(datasets::ToothGrowth, len2, supp, dose)
-ToothGrowth <- arrange(datasets::ToothGrowth, dose, supp, len2)
+ToothGrowth <- select(datasets::ToothGrowth, supp, dose)
+ToothGrowth <- arrange(datasets::ToothGrowth, dose, supp, len)
 ```
 
 The code fragment `datasets::` indicates that the following object must be taken from the datasets package. This can be useful for ensuring R uses the correct object if multiple objects with the same name exist in the search path. Later I use it to remind the reader that a particular package must be loaded to run the code.
@@ -398,7 +401,7 @@ ToothGrowth <- arrange(select(mutate(filter(datasets::ToothGrowth, len < 30), le
   len2, supp, dose), dose, supp, len2)
 ```
 
-To improve readability, the same operations can be joined in left to right order using the forward-pipe operator `%>%` in the `magrittr` package
+To improve readability, the same operations can be joined in left to right order using the forward-pipe operator `%>%` (pronounced 'then') in the `magrittr` package
 to 
 ```{r, eval = FALSE}
 install.packages("magrittr")
@@ -420,25 +423,25 @@ In [tidy data](https://github.com/jtleek/datasharing#the-tidy-data-set):
 1. Each type of observational unit forms a table.
 1. Multiple tables include a column(s) that allow them to be linked.
 
-The following code uses the `tidyr::gather` function to convert the `stocks` data frame from wide to long format so that it now satisfies the first condition. 
-```{r}
+The following code uses the `tidyr::gather` function to convert the a data frame from wide to long format so that it satisfies the first condition. 
+```{r, results = 'hide'}
 install.packages("tidyr")
 library(tidyr)
-stocks <- data.frame( time = 1:10, X = seq(-2,3, length.out = 10),
-  Y = 3:12, Z = -10:-1)
-
-head(stocks)
-stocks <- gather(stocks, stock, price, -time)
-head(stocks)
 ```
 
+```{r}
+dayCount <- data.frame(day = 1:3, year1 = seq(-3,-4, length.out = 3), year2 = 4:6, year3 = -1:1)
+dayCount
+dayCount <- gather(dayCount, year, count, -day)
+dayCount
+```
 The complement to `tidyr::gather()` is the `tidyr::spread` function.
 ```{r}
-head(spread(stocks, stock, price))
+spread(dayCount, year, count)
 ```
 
 ```{r, echo = FALSE, results = 'asis'}
-exercise("What happens if you filter negative prices from the gathered `stocks` data frame before spreading?")
+exercise("What happens if you filter negative prices from the gathered `dayCount` data frame before spreading?")
 ```
 
 # Programming
@@ -453,7 +456,7 @@ Open a new script using the R Script suboption of the New option in the File men
 ```{r, eval=FALSE}
 # this is a comment!
 graphics.off()
-rm(ls=objects())
+rm(list = ls())
 
 summary(datasets::trees)
 ```
@@ -493,12 +496,11 @@ definition starts and ends. The first line of code in the function definition
 converts `farenheit` to `kelvin` while the second and last line tells the 
 function to return the value of `kelvin`.
 
-Paste the code into a script and then run it. R does nothing because executing the code
-simply defines the function. List the contents of your workspace  using `ls()` and you will see
-`farenheit_to_kelvin` present. If you type `farenheit_to_kelvin` R will print 
-the object for you which in this case is the function definition. 
-To call the function you have to remember to follow 
-its name with paired brackets that include any arguments you wish to pass to the function, i.e., `farenheit_to_kelvin(c(0, 32))`.
+```{r, echo = FALSE, results = 'asis'}
+exercise("Paste the code into a script and then execute it. What happens?
+  Now type `farenheit_to_kelvin`. What happens? Finally type
+  `farenheit_to_kelvin(c(0, 32))`. What happens now?")
+```
 
 # Graphics
 The `ggplot2` library provides a family of functions for producing high-quality graphics within
