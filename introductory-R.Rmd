@@ -15,7 +15,7 @@ output:
 
 library(knitr)
 opts_chunk$set(tidy = TRUE)
-options(width = 80)
+options(width = 70)
 
 exercise_number <- 0
 exercise <- function (txt) {
@@ -56,8 +56,6 @@ fn = local({
 The purpose of these course notes is to introduce participants to basic programming, graphics and statistics in R.
 
 The notes, which are released under a [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/deed.en_US) license, are a draft of the material to be presented at the [Introductory R Course](/courses/2014/04/02/rcourse.html) in Kelowna on November 18^th^-19^th^, 2014. They were written by [Dr. Joseph Thorley R.P.Bio.](http://www.poissonconsulting.ca/people/joe-thorley.html).
-
-They are available [online](http://www.poissonconsulting.ca/temporary-hidden-link-3423423234/courses/introductory-R.html) and as a [pdf](introductory-R.pdf).
 
 ## R, S and S-Plus
 
