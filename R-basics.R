@@ -46,3 +46,4 @@ rm(list = ls())
 x <- 7.7
 y <- x^x
 y
+message("Load the package foreign. What arguments does the function read.dbf in the foreign package take?")
