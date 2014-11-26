@@ -1,4 +1,4 @@
-introductory-R-course-14
-========================
+Introductory R Course Notes
 
-Course notes
+The presented material can be viewed at
+<http://www.poissonconsulting.ca/course/2014/09/12/an-introduction-to-r-course.html>
