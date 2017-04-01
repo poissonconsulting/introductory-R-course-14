@@ -1,4 +1,4 @@
-![stability-frozen](https://img.shields.io/badge/stability-locked-blue.svg)
+![stability-deprecated](https://img.shields.io/badge/stability-deprecated-red.svg)
 
 Introductory R Course Notes
 
