@@ -1,3 +1,5 @@
+![stability-frozen](https://img.shields.io/badge/stability-locked-blue.svg)
+
 Introductory R Course Notes
 
 The presented material can be viewed at
